@@ -1,9 +1,9 @@
+#ifndef INCLUDED_MAHJONG_SETTING_DIALOG
+#define INCLUDED_MAHJONG_SETTING_DIALOG
+
 #include <M5Stack.h>
 #include "MahjongSetting.h"
 #include "DialogManager.h"
-
-#ifndef INCLUDED_MAHJONG_SETTING_DIALOG
-#define INCLUDED_MAHJONG_SETTING_DIALOG
 
 class MahjongSettingDialog {
   private:
