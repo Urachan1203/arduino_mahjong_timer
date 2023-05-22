@@ -1,18 +1,22 @@
 #ifndef INCLUDED_MAHJONG_SETTING
 #define INCLUDED_MAHJONG_SETTING
 
+#include "Player.h"
+
+#define MAX_PLAYER_NUM 4
+
 class MahjongSetting {
 
   private:
   int num_player;
-  int limit_time_mu;
+  Player players[MAX_PLAYER_NUM];
   
   public:
   MahjongSetting();
-  void Init();
   void SetNumPlayer(int num_player);
-  void SetLimitTimeSec(int limit_time_sec);
-  
+  int GetNumPlayer();
+  void SetPlayer(int idx, Player p);
+  Player* GetPlayer(int idx);
 };
 
 #endif
