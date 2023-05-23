@@ -3,12 +3,46 @@
 #include "MahjongSetting.h"
 #include <M5Stack.h>
 
-void TimerDialog::Display(MahjongSetting* ms){
+void TimerDialog::Display(MahjongSetting* ms, TimerCommand tc){
     M5.Lcd.clear();
     int num_player = ms->GetNumPlayer();
-    M5.Lcd.setCursor(0, 0);
+
+    if(tc == TimerCommand::Pause){
+        M5.Lcd.setTextSize(3);
+        M5.Lcd.setCursor(10, 10);
+        M5.Lcd.println("Status : Pause");
+    }else{
+        M5.Lcd.setTextSize(3);
+        M5.Lcd.setCursor(10, 10);
+        M5.Lcd.println("Status : Playing");
+    }
+
+    M5.Lcd.setTextSize(7);
+    M5.Lcd.setCursor(200, 110);
+    M5.Lcd.println("+");
+    M5.Lcd.setCursor(240, 110);
+    M5.Lcd.println(Timer::GetBaseTimeSec());
+
+    M5.Lcd.setTextSize(1);
+    M5.Lcd.setCursor(1, 220);
+    M5.Lcd.println("Next");
+    M5.Lcd.setCursor(1, 230);
+    M5.Lcd.println("Pause/Continue");
+    M5.Lcd.setCursor(130, 220);
+    M5.Lcd.println("Change Order");
+    M5.Lcd.setCursor(250, 220);
+    M5.Lcd.println("Next");
+
+    M5.Lcd.setTextSize(3);
     for(int i = 0; i < ms->GetNumPlayer(); i++){
-        M5.Lcd.println(Timer::GetBaseTimeSec());
+
+        if(Timer::GetCurIdx() == i){
+            M5.Lcd.setCursor(30, 80 + 30 * i);
+            M5.Lcd.println("x");
+        }
+        M5.Lcd.setCursor(80, 80 + 30 * i);
+        M5.Lcd.println(ms->GetPlayer(i)->GetPlayerName());
+        M5.Lcd.setCursor(130, 80 + 30 * i);
         M5.Lcd.println(Timer::GetTimeRemainSec(i));
     }
     return;

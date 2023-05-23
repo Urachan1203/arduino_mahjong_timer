@@ -3,10 +3,12 @@
 
 #include <M5Stack.h>
 #include "MahjongSetting.h"
+#include "Timer.h"
+
 
 class TimerDialog {
     public:
-    static void Display(MahjongSetting* ms);
+    static void Display(MahjongSetting* ms, TimerCommand tc);
 };
 
 #endif
