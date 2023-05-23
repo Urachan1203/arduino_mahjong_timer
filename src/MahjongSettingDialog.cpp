@@ -27,8 +27,9 @@ void MahjongSettingDialog::SetCurIdx(int idx){
 }
 
 void MahjongSettingDialog::Display(){
+    M5.Lcd.clear();
+    
     MahjongSetting* s = GetSetting();
-
     int num_player = s->GetNumPlayer();
 
     M5.Lcd.setTextSize(3);
@@ -83,7 +84,6 @@ void MahjongSettingDialog::DoSetting(DialogManager* dm){
         // select player
         if (M5.BtnA.wasReleased()){
             this->cur_idx = (cur_idx + 1) % num_player;
-            M5.Lcd.clear();
             this->Display();
         }
 
@@ -92,7 +92,7 @@ void MahjongSettingDialog::DoSetting(DialogManager* dm){
             if (this->GetSetting()->GetNumPlayer() == 4) this->GetSetting()->SetNumPlayer(3);
             else if (this->GetSetting()->GetNumPlayer() == 3) this->GetSetting()->SetNumPlayer(4);
             num_player = this->GetSetting()->GetNumPlayer(); //update
-            M5.Lcd.clear();
+            
             this->Display();
         }
         
@@ -100,14 +100,14 @@ void MahjongSettingDialog::DoSetting(DialogManager* dm){
         if (M5.BtnB.wasReleased()){
             int cur_time = this->GetSetting()->GetPlayer(this->cur_idx)->GetTimeRemainSec();
             this->GetSetting()->GetPlayer(this->cur_idx)->SetTimeRemainSec((cur_time + 10) % 400);
-            M5.Lcd.clear();
+            
             this->Display();
         }
 
         if (M5.BtnC.wasReleased()){
             int cur_time = this->GetSetting()->GetPlayer(this->cur_idx)->GetTimeRemainSec();
             this->GetSetting()->GetPlayer(this->cur_idx)->SetTimeRemainSec((cur_time - 10) % 400);
-            M5.Lcd.clear();
+            
             this->Display();
         }
 

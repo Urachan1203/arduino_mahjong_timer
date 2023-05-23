@@ -14,6 +14,7 @@ class Timer {
     static void Init(int idx, MahjongSetting* m);
     static void CountTime();
     static void Down();
+    static void SetMahjongSetting(MahjongSetting* m);
     static MahjongSetting* GetMahjongSetting();
     static int GetCurIdx();
     static void SetCurIdx(int idx);
