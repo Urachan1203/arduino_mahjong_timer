@@ -10,6 +10,8 @@ int Timer::time_remain_sec[MAX_PLAYER_NUM];
 
 hw_timer_t * timer = NULL;
 
+bool pause_enabled = true;
+
 void IRAM_ATTR onTimer() {
 
     if(Timer::GetBaseTimeSec() > 0){
@@ -18,7 +20,8 @@ void IRAM_ATTR onTimer() {
     else if(Timer::GetTimeRemainSec(Timer::GetCurIdx()) > 0){
         Timer::SetTimeRemainSec(Timer::GetCurIdx(), Timer::GetTimeRemainSec(Timer::GetCurIdx()) - 1);
     }
-    TimerDialog::Display(Timer::GetMahjongSetting());
+    TimerDialog::Display(Timer::GetMahjongSetting(), TimerCommand::Continue);
+    pause_enabled = true;
 }
 
 void Timer::Init(int idx, MahjongSetting* m){
@@ -42,15 +45,26 @@ void Timer::CountTime(){
     int time_tmp = Timer::GetBaseTimeSec();
     timerAlarmEnable(timer);
 
+    TimerCommand cmd;
+
     while(1){
         M5.update();
         //! 自分のターンが終わったら押下
-        if(M5.BtnA.wasPressed() || M5.BtnC.wasPressed()){
+        if(M5.BtnA.wasReleased() || M5.BtnC.wasReleased()){
+            cmd = TimerCommand::Continue;
             break;
         }
-        //! ポン発生時に押下
-        if(M5.BtnB.wasPressed()){
+        //! 順番変更時に押下
+        if(M5.BtnB.wasReleased()){
+            cmd = TimerCommand::ChangeOrder;
             break;
+        }
+        //! ポーズ
+        if(M5.BtnA.pressedFor(1000) && pause_enabled){
+            cmd = TimerCommand::Pause;
+            Timer::Pause();
+            cmd = TimerCommand::Continue;
+            pause_enabled = false;
         }
     }
     timerAlarmDisable(timer);
@@ -63,6 +77,20 @@ void Timer::CountTime(){
     return;
 }
 
+// press BtnA for 1 sec to continue
+void Timer::Pause(){
+    timerAlarmDisable(timer);
+    TimerDialog::Display(ms, TimerCommand::Pause);
+    sleep(2);
+    while(1){
+        M5.update();
+        if(M5.BtnA.pressedFor(1000)){
+            timerAlarmEnable(timer);
+            break;
+        }
+    }
+}
+
 void Timer::Down(){
     if(Timer::GetBaseTimeSec() > 0){
         Timer::SetBaseTimeSec(Timer::GetBaseTimeSec() - 1);
@@ -70,7 +98,7 @@ void Timer::Down(){
     else if(Timer::GetTimeRemainSec(Timer::GetCurIdx()) > 0){
         Timer::SetTimeRemainSec(Timer::GetCurIdx(), Timer::GetTimeRemainSec(Timer::GetCurIdx()) - 1);
     }
-    TimerDialog::Display(ms);
+    TimerDialog::Display(Timer::GetMahjongSetting(), TimerCommand::Continue);
     return;
 }
 

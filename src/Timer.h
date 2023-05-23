@@ -3,6 +3,14 @@
 
 #include "MahjongSetting.h"
 
+enum class TimerCommand{
+    Continue,
+    ChangeOrder,
+    Pause,
+    Reset,
+    GoSetting,
+};
+
 class Timer {
     private:
     static MahjongSetting* ms;
@@ -14,6 +22,7 @@ class Timer {
     static void Init(int idx, MahjongSetting* m);
     static void CountTime();
     static void Down();
+    static void Pause();
     static void SetMahjongSetting(MahjongSetting* m);
     static MahjongSetting* GetMahjongSetting();
     static int GetCurIdx();
