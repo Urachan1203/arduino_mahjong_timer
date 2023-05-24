@@ -1,12 +1,16 @@
 #include "Timer.h"
 #include "MahjongSetting.h"
 #include "TimerDialog.h"
+#include "TimeDispMsg.h"
 #include <M5Stack.h>
+#include <LiquidCrystal_I2C.h>
 
 MahjongSetting* Timer::ms;
 int Timer::cur_idx;
 int Timer::base_time_sec;
 int Timer::time_remain_sec[MAX_PLAYER_NUM];
+
+QueueHandle_t xQueue;
 
 hw_timer_t * timer = NULL;
 
@@ -14,14 +18,22 @@ bool pause_enabled = true;
 
 void IRAM_ATTR onTimer() {
 
+    int cur_idx = Timer::GetCurIdx();
+
     if(Timer::GetBaseTimeSec() > 0){
         Timer::SetBaseTimeSec(Timer::GetBaseTimeSec() - 1);
     }
-    else if(Timer::GetTimeRemainSec(Timer::GetCurIdx()) > 0){
-        Timer::SetTimeRemainSec(Timer::GetCurIdx(), Timer::GetTimeRemainSec(Timer::GetCurIdx()) - 1);
+    else if(Timer::GetTimeRemainSec(cur_idx) > 0){
+        Timer::SetTimeRemainSec(cur_idx, Timer::GetTimeRemainSec(cur_idx) - 1); // count down 1 sec
     }
     TimerDialog::Display(Timer::GetMahjongSetting(), TimerCommand::Continue);
+
     pause_enabled = true;
+
+    TimeDispMsg msg = TimeDispMsg(cur_idx, Timer::GetTimeRemainSec(cur_idx), Timer::GetBaseTimeSec());
+    xQueueSend(xQueue, &msg, 0);
+
+    return;
 }
 
 void Timer::Init(int idx, MahjongSetting* m){
@@ -31,12 +43,23 @@ void Timer::Init(int idx, MahjongSetting* m){
 
     for(int i = 0; i < m->GetNumPlayer(); i++){
         Timer::SetTimeRemainSec(i, m->GetPlayer(i)->GetTimeRemainSec());
+        LiquidCrystal_I2C target_lcd = m->GetPlayer(i)->GetPlayerLcd();
+
+        // TODO : 関数化？
+        Serial.println((long) &target_lcd);
+        target_lcd.clear();
+        target_lcd.setCursor(0, 0);
+        target_lcd.print("Time Left : ");
+        target_lcd.setCursor(13, 0);
+        target_lcd.print(Timer::GetTimeRemainSec(i));
     }
 
     // timer initialization
     timer = timerBegin(0, 80, true);
     timerAttachInterrupt(timer, &onTimer, true);
     timerAlarmWrite(timer, 1000000, true);      // call onTimer every 1 sec
+
+    xQueue = xQueueCreate(3, sizeof(TimeDispMsg));
 
     return;
 }
@@ -66,6 +89,27 @@ void Timer::CountTime(){
             cmd = TimerCommand::Continue;
             pause_enabled = false;
         }
+
+        TimeDispMsg recv;
+        portBASE_TYPE ret = xQueueReceive(xQueue, &recv, 0);
+
+        if(ret == pdTRUE){
+            Serial.println("received.");
+            Serial.println(recv.idx);
+            Serial.println(recv.time_remain);
+            Serial.println(recv.time_base);
+            LiquidCrystal_I2C target_lcd = Timer::GetMahjongSetting()->GetPlayer(recv.idx)->GetPlayerLcd(); 
+            target_lcd.clear();
+            target_lcd.setCursor(0, 0);
+            target_lcd.print("Time Left : ");
+            target_lcd.setCursor(13, 0);
+            target_lcd.print(recv.time_remain);
+            target_lcd.setCursor(0, 1);
+            target_lcd.print("Turn time : ");    // 13 character
+            target_lcd.setCursor(13, 1);
+            target_lcd.print(recv.time_base);
+        }
+        
     }
     timerAlarmDisable(timer);
 
