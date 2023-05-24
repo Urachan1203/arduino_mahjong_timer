@@ -4,6 +4,8 @@
 #include "PlayerLcd.h"
 #include <M5Stack.h>
 
+#include <LiquidCrystal_I2C.h>
+
 #define PLAYER_NUM_INIT 4
 #define MAX_PLAYER_NAME_STRLEN 6  // 5 + null string
 #define BASE_TIME_SEC 10
