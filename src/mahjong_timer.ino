@@ -5,6 +5,7 @@
 #include "DialogManager.h"
 #include <M5Stack.h>
 #include "PlayerLcd.h"
+#include <LiquidCrystal_I2C.h>
 
 MahjongSetting ms;
 
@@ -30,7 +31,6 @@ void loop(){
 
   // counting
   Timer::Init(0, &ms);
-
   
   while(1){
     
@@ -40,30 +40,7 @@ void loop(){
      // 2 : reset timer -> break
      // 3 : go setting -> break & show setting dialog
     Timer::CountTime();
+    
   }
 
 }
-
-// #include <LiquidCrystal_I2C.h>
-// #include <stdint.h>
-// void setup(){
-//   LiquidCrystal_I2C lcds[4];
-//   uint8_t addr[4] = {0x23, 0x25, 0x26, 0x27};
-
-//   for(int i = 0; i < 4; i++){
-//     LiquidCrystal_I2C lcd = LiquidCrystal_I2C(addr[i], 16, 2);
-//     lcd.init();
-//     lcd.init();
-//     lcd.backlight();
-//     lcd.clear();
-//     lcd.setCursor(0, 0);
-//     lcds[i] = lcd;
-//   }
-//   for(int i = 0; i < 4; i++){
-//     lcds[i].print("init");
-//   }
-// }
-
-// void loop(){
-
-// }
