@@ -1,6 +1,8 @@
 #include "MahjongSetting.h"
 #include "Player.h"
 #include <string.h>
+#include "PlayerLcd.h"
+#include <M5Stack.h>
 
 #define PLAYER_NUM_INIT 4
 #define MAX_PLAYER_NAME_STRLEN 6  // 5 + null string
@@ -14,7 +16,7 @@ MahjongSetting::MahjongSetting(){
   for(int i = 0; i < PLAYER_NUM_INIT; i++){
     char name[MAX_PLAYER_NAME_STRLEN] = "p";
     name[1] = (i + 1) + '0';  // int to char, +1 for display name
-    Player p = Player(name, 300);
+    Player p = Player(name, 300, PlayerLcd::lcd_addr_list[i]);
     this->SetPlayer(i, p);
   }
 }
