@@ -11,7 +11,7 @@ class Player {
     private:
     char player_name[MAX_PLAYER_NAME_STRLEN];
     int time_remain_sec;
-    // LiquidCrystal_I2C player_lcd;
+    LiquidCrystal_I2C player_lcd;
 
     public:
     Player();

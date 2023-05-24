@@ -4,18 +4,25 @@
 #include "TimerDialog.h"
 #include "DialogManager.h"
 #include <M5Stack.h>
+#include "PlayerLcd.h"
 
-MahjongSetting ms = MahjongSetting();
-DialogManager dm = DialogManager();
+MahjongSetting ms;
+
+void SystemInit(){
+  M5.begin();
+  Serial.begin(115200);
+}
 
 void setup(){
-  M5.begin();
+  SystemInit();
+  
+  ms = MahjongSetting();
+  DialogManager dm = DialogManager(); 
 
   // create and display setting dialog 
   MahjongSettingDialog msd = MahjongSettingDialog(&ms, 0);
   msd.DoSetting(&dm);
 
-  
 }
 
 void loop(){
@@ -38,19 +45,25 @@ void loop(){
 }
 
 // #include <LiquidCrystal_I2C.h>
+// #include <stdint.h>
+// void setup(){
+//   LiquidCrystal_I2C lcds[4];
+//   uint8_t addr[4] = {0x23, 0x25, 0x26, 0x27};
 
-// //アドレス0x27 １６文字２行の液晶
-// LiquidCrystal_I2C lcd(0x27, 16, 2);
-
-// void setup() {
-//   lcd.init();
-//   lcd.backlight();
-//   lcd.clear();
-//   lcd.setCursor(0, 0);
-//   lcd.print("abc");
-//   lcd.setCursor(3, 1);
-//   lcd.print("DEF");
+//   for(int i = 0; i < 4; i++){
+//     LiquidCrystal_I2C lcd = LiquidCrystal_I2C(addr[i], 16, 2);
+//     lcd.init();
+//     lcd.init();
+//     lcd.backlight();
+//     lcd.clear();
+//     lcd.setCursor(0, 0);
+//     lcds[i] = lcd;
+//   }
+//   for(int i = 0; i < 4; i++){
+//     lcds[i].print("init");
+//   }
 // }
 
-// void loop() {
+// void loop(){
+
 // }
