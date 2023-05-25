@@ -20,7 +20,7 @@ class Timer {
 
     public:
     static void Init(int idx, MahjongSetting* m);
-    static void CountTime();
+    static TimerCommand CountTime(bool count_started);
     static void Down();
     static void Pause();
     static void SetMahjongSetting(MahjongSetting* m);

@@ -64,7 +64,7 @@ void Timer::Init(int idx, MahjongSetting* m){
     return;
 }
 
-void Timer::CountTime(){
+TimerCommand Timer::CountTime(bool count_started){
     int time_tmp = Timer::GetBaseTimeSec();
     timerAlarmEnable(timer);
 
@@ -83,11 +83,17 @@ void Timer::CountTime(){
             break;
         }
         //! ポーズ
-        if(M5.BtnA.pressedFor(1000) && pause_enabled){
+        if(! count_started  || (M5.BtnA.pressedFor(1000) && pause_enabled)){
             cmd = TimerCommand::Pause;
             Timer::Pause();
             cmd = TimerCommand::Continue;
+            count_started = true;
             pause_enabled = false;
+        }
+        //! リセット
+        if(M5.BtnC.pressedFor(2000) && pause_enabled){
+            cmd = TimerCommand::Reset;
+            break;
         }
 
         TimeDispMsg recv;
@@ -118,7 +124,8 @@ void Timer::CountTime(){
     //! cur_idx を次の人へ
     //! ポン発生時はこの限りではないので、順番割り込みを行うダイアログの実装がTODO
     Timer::SetCurIdx((Timer::GetCurIdx() + 1) % Timer::GetMahjongSetting()->GetNumPlayer());
-    return;
+
+    return cmd;
 }
 
 // press BtnA for 1 sec to continue

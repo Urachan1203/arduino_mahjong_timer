@@ -18,9 +18,9 @@ void TimerDialog::Display(MahjongSetting* ms, TimerCommand tc){
     }
 
     M5.Lcd.setTextSize(7);
-    M5.Lcd.setCursor(200, 110);
+    M5.Lcd.setCursor(190, 110);
     M5.Lcd.println("+");
-    M5.Lcd.setCursor(240, 110);
+    M5.Lcd.setCursor(230, 110);
     M5.Lcd.println(Timer::GetBaseTimeSec());
 
     M5.Lcd.setTextSize(1);
@@ -37,12 +37,12 @@ void TimerDialog::Display(MahjongSetting* ms, TimerCommand tc){
     for(int i = 0; i < ms->GetNumPlayer(); i++){
 
         if(Timer::GetCurIdx() == i){
-            M5.Lcd.setCursor(30, 80 + 30 * i);
+            M5.Lcd.setCursor(20, 80 + 30 * i);
             M5.Lcd.println("x");
         }
-        M5.Lcd.setCursor(80, 80 + 30 * i);
+        M5.Lcd.setCursor(70, 80 + 30 * i);
         M5.Lcd.println(ms->GetPlayer(i)->GetPlayerName());
-        M5.Lcd.setCursor(130, 80 + 30 * i);
+        M5.Lcd.setCursor(120, 80 + 30 * i);
         M5.Lcd.println(Timer::GetTimeRemainSec(i));
     }
     return;

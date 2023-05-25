@@ -29,18 +29,18 @@ void setup(){
 void loop(){
   // TODO : 親プレイヤーの選択を行う（PlayerSelectorDialog を作る？順番割り込みの実装で使い回せそう）
 
-  // counting
+  // resetされたらここからスタートする
   Timer::Init(0, &ms);
-  
-  while(1){
-    
+
+  bool count_started = false;
+  while(1){    
      // TODO : 適当なステータスコードを返す
      // 0 : カウント継続 -> while を回り続ける
      // 1 : pause -> while の中で止まる
      // 2 : reset timer -> break
      // 3 : go setting -> break & show setting dialog
-    Timer::CountTime();
-    
+    if(TimerCommand::Reset == Timer::CountTime(count_started)) break;
+    count_started = true;
   }
 
 }
