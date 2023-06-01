@@ -3,7 +3,6 @@
 
 #include <M5Stack.h>
 #include "MahjongSetting.h"
-#include "DialogManager.h"
 
 class MahjongSettingDialog {
   private:
