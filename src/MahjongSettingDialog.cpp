@@ -47,13 +47,13 @@ void MahjongSettingDialog::Display(){
     M5.Lcd.setCursor(1, 220);
     M5.Lcd.println("select player");
     M5.Lcd.setCursor(1, 230);
-    M5.Lcd.println("switch yomma/samma");
+    M5.Lcd.println("yomma/samma");
     M5.Lcd.setCursor(130, 220);
-    M5.Lcd.println("set time +");
-    M5.Lcd.setCursor(250, 220);
     M5.Lcd.println("set time -");
+    M5.Lcd.setCursor(250, 220);
+    M5.Lcd.println("set time +");
     M5.Lcd.setCursor(250, 230);
-    M5.Lcd.println("exit");
+    M5.Lcd.println("OK");
     
 
     for(int i = 0; i < s->GetNumPlayer(); i++){
@@ -71,10 +71,10 @@ void MahjongSettingDialog::Display(){
     return;
 }
 
-void MahjongSettingDialog::DoSetting(DialogManager* dm){
+void MahjongSettingDialog::DoSetting(){
     
     this->Display();
-    dm->SetActiveDialog(ActiveDialog::MahjongSettingDialog);
+    // dm->SetActiveDialog(ActiveDialog::MahjongSettingDialog);
 
     int num_player = this->GetSetting()->GetNumPlayer();
 
@@ -99,14 +99,14 @@ void MahjongSettingDialog::DoSetting(DialogManager* dm){
         // set time limit for each player
         if (M5.BtnB.wasReleased()){
             int cur_time = this->GetSetting()->GetPlayer(this->cur_idx)->GetTimeRemainSec();
-            this->GetSetting()->GetPlayer(this->cur_idx)->SetTimeRemainSec((cur_time + 10) % 400);
+            this->GetSetting()->GetPlayer(this->cur_idx)->SetTimeRemainSec((cur_time - 10) % 400);
             
             this->Display();
         }
 
         if (M5.BtnC.wasReleased()){
             int cur_time = this->GetSetting()->GetPlayer(this->cur_idx)->GetTimeRemainSec();
-            this->GetSetting()->GetPlayer(this->cur_idx)->SetTimeRemainSec((cur_time - 10) % 400);
+            this->GetSetting()->GetPlayer(this->cur_idx)->SetTimeRemainSec((cur_time + 10) % 400);
             
             this->Display();
         }
