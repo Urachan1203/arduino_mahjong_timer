@@ -9,6 +9,7 @@
 #define PLAYER_NUM_INIT 4
 #define MAX_PLAYER_NAME_STRLEN 6  // 5 + null string
 #define BASE_TIME_SEC 10
+#define DEFAULT_REMAIN_TIME_SEC 60
 
 MahjongSetting::MahjongSetting(){
   this->SetNumPlayer(PLAYER_NUM_INIT);
@@ -18,7 +19,7 @@ MahjongSetting::MahjongSetting(){
   for(int i = 0; i < PLAYER_NUM_INIT; i++){
     char name[MAX_PLAYER_NAME_STRLEN] = "p";
     name[1] = (i + 1) + '0';  // int to char, +1 for display name
-    Player p = Player(name, 300, PlayerLcd::lcd_addr_list[i]);
+    Player p = Player(name, DEFAULT_REMAIN_TIME_SEC, PlayerLcd::lcd_addr_list[i]);
     this->SetPlayer(i, p);
   }
 }
