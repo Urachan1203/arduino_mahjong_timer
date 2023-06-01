@@ -17,7 +17,7 @@ class MahjongSettingDialog {
   void SetCurIdx(int idx);
   int GetCurIdx();
   void Display();
-  void DoSetting(DialogManager* dm);
+  void DoSetting();
 };
 
 #endif

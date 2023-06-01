@@ -8,7 +8,7 @@
 
 class TimerDialog {
     public:
-    static void Display(MahjongSetting* ms, TimerCommand tc);
+    static void Display(MahjongSetting* ms, TimerStatus tc);
 };
 
 #endif

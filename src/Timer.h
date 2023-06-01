@@ -3,7 +3,7 @@
 
 #include "MahjongSetting.h"
 
-enum class TimerCommand{
+enum class TimerStatus{
     Continue,
     ChangeOrder,
     Pause,
@@ -20,7 +20,7 @@ class Timer {
 
     public:
     static void Init(int idx, MahjongSetting* m);
-    static TimerCommand CountTime(bool count_started);
+    static TimerStatus CountTime(bool count_started);
     static void Down();
     static void Pause();
     static void SetMahjongSetting(MahjongSetting* m);
