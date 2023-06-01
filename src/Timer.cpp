@@ -3,6 +3,7 @@
 #include "TimerDialog.h"
 #include "TimeDispMsg.h"
 #include "PlayerSelectDialog.h"
+#include "M5ButtonWrapper.h"
 #include <M5Stack.h>
 #include <LiquidCrystal_I2C.h>
 
@@ -50,7 +51,7 @@ void Timer::Init(int idx, MahjongSetting* m){
         LiquidCrystal_I2C target_lcd = m->GetPlayer(i)->GetPlayerLcd();
 
         // TODO : 関数化？
-        Serial.println((long) &target_lcd);
+        
         target_lcd.clear();
         target_lcd.setCursor(0, 0);
         target_lcd.print("Time Left : ");
@@ -78,6 +79,7 @@ TimerStatus Timer::CountTime(bool count_started){
 
     TimerStatus status;
 
+    // TODO : TimerDialogの方に書くべきな気がする
     while(1){
         M5.update();
         //! 自分のターンが終わったら押下
@@ -90,16 +92,18 @@ TimerStatus Timer::CountTime(bool count_started){
             status = TimerStatus::ChangeOrder;
             break;
         }
-        //! ポーズ
-        if(! count_started  || (M5.BtnA.pressedFor(1000) && pause_enabled)){
+        //! ポーズ & 最初はここに入る
+        if(!count_started  || BtnA.isLongPressed(1)){
             status = TimerStatus::Pause;
             Timer::Pause();
             status = TimerStatus::Continue;
             count_started = true;
             pause_enabled = false;
+            M5Button::RefleshAllButton();
+            
         }
         //! リセット
-        if(M5.BtnC.pressedFor(2000) && pause_enabled){
+        if(BtnC.isLongPressed(1)){
             status = TimerStatus::Reset;
             break;
         }
@@ -108,10 +112,6 @@ TimerStatus Timer::CountTime(bool count_started){
         portBASE_TYPE ret = xQueueReceive(xQueue, &recv, 0);
 
         if(ret == pdTRUE){
-            Serial.println("received.");
-            Serial.println(recv.idx);
-            Serial.println(recv.time_remain);
-            Serial.println(recv.time_base);
             LiquidCrystal_I2C target_lcd = Timer::GetMahjongSetting()->GetPlayer(recv.idx)->GetPlayerLcd(); 
             target_lcd.clear();
             target_lcd.setCursor(0, 0);
@@ -119,12 +119,14 @@ TimerStatus Timer::CountTime(bool count_started){
             target_lcd.setCursor(13, 0);
             target_lcd.print(recv.time_remain);
             target_lcd.setCursor(0, 1);
-            target_lcd.print("Turn time : ");    // 13 character
+            target_lcd.print("Turn Time : ");    // 13 character
             target_lcd.setCursor(13, 1);
             target_lcd.print(recv.time_base);
         }
         
     }
+    // TODO : ここまで
+
     timerAlarmDisable(timer);           // カウントを停止
     Timer::SetBaseTimeSec(time_tmp);    // カウントが終了したので、basetimeを元に戻す
 
@@ -144,10 +146,10 @@ TimerStatus Timer::CountTime(bool count_started){
 void Timer::Pause(){
     timerAlarmDisable(timer);
     TimerDialog::Display(ms, TimerStatus::Pause);
-    sleep(2);
+    M5Button::RefleshAllButton();
     while(1){
         M5.update();
-        if(M5.BtnA.pressedFor(1000)){
+        if(BtnA.isLongPressed(1)){
             timerAlarmEnable(timer);
             break;
         }

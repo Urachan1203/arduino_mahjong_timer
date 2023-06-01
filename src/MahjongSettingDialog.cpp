@@ -1,6 +1,6 @@
 #include "MahjongSettingDialog.h"
-#include "DialogManager.h"
 #include "Player.h"
+#include "M5ButtonWrapper.h"
 #include <M5Stack.h>
 
 MahjongSettingDialog::MahjongSettingDialog(MahjongSetting* setting, int cur_idx){
@@ -74,7 +74,6 @@ void MahjongSettingDialog::Display(){
 void MahjongSettingDialog::DoSetting(){
     
     this->Display();
-    // dm->SetActiveDialog(ActiveDialog::MahjongSettingDialog);
 
     int num_player = this->GetSetting()->GetNumPlayer();
 
@@ -82,29 +81,30 @@ void MahjongSettingDialog::DoSetting(){
         M5.update();
 
         // select player
-        if (M5.BtnA.wasReleased()){
+        if (BtnA.wasReleased()){
             this->cur_idx = (cur_idx + 1) % num_player;
             this->Display();
         }
 
         // select game mode (4player or samma)
-        if (M5.BtnA.wasReleasefor(1000)){
+        if (BtnA.isLongPressed(1.0)){
             if (this->GetSetting()->GetNumPlayer() == 4) this->GetSetting()->SetNumPlayer(3);
             else if (this->GetSetting()->GetNumPlayer() == 3) this->GetSetting()->SetNumPlayer(4);
             num_player = this->GetSetting()->GetNumPlayer(); //update
             
             this->Display();
+            M5Button::RefleshAllButton();
         }
         
         // set time limit for each player
-        if (M5.BtnB.wasReleased()){
+        if (BtnB.wasReleased()){
             int cur_time = this->GetSetting()->GetPlayer(this->cur_idx)->GetTimeRemainSec();
-            this->GetSetting()->GetPlayer(this->cur_idx)->SetTimeRemainSec((cur_time - 10) % 400);
+            this->GetSetting()->GetPlayer(this->cur_idx)->SetTimeRemainSec((cur_time + 390) % 400);
             
             this->Display();
         }
 
-        if (M5.BtnC.wasReleased()){
+        if (BtnC.wasReleased()){
             int cur_time = this->GetSetting()->GetPlayer(this->cur_idx)->GetTimeRemainSec();
             this->GetSetting()->GetPlayer(this->cur_idx)->SetTimeRemainSec((cur_time + 10) % 400);
             
@@ -112,7 +112,7 @@ void MahjongSettingDialog::DoSetting(){
         }
 
         // exit setting
-        if (M5.BtnC.wasReleasefor(1000)) break;
+        if (BtnC.isLongPressed(1.0)) break;
     }
 
     return;
