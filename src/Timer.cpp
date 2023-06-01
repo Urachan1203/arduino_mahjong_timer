@@ -1,11 +1,12 @@
+#include <M5Stack.h>
+#include <LiquidCrystal_I2C.h>
 #include "Timer.h"
 #include "MahjongSetting.h"
 #include "TimerDialog.h"
 #include "TimeDispMsg.h"
 #include "PlayerSelectDialog.h"
 #include "M5ButtonWrapper.h"
-#include <M5Stack.h>
-#include <LiquidCrystal_I2C.h>
+
 
 MahjongSetting* Timer::ms;
 int Timer::cur_idx;

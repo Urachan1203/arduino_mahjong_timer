@@ -1,7 +1,7 @@
+#include <M5Stack.h>
 #include "MahjongSettingDialog.h"
 #include "Player.h"
 #include "M5ButtonWrapper.h"
-#include <M5Stack.h>
 
 MahjongSettingDialog::MahjongSettingDialog(MahjongSetting* setting, int cur_idx){
     SetSetting(setting);

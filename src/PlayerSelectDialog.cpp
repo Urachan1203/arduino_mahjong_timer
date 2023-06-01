@@ -1,7 +1,8 @@
+#include <M5Stack.h>
 #include "PlayerSelectDialog.h"
 #include "MahjongSetting.h"
 #include "M5ButtonWrapper.h"
-#include <M5Stack.h>
+
 
 const uint16_t CURSOR_X[4] = {150, 290, 150, 0};
 const uint16_t CURSOR_Y[4] = {190, 100, 0, 100};
@@ -68,6 +69,7 @@ int PlayerSelectDialog::ListenButtonInput(){
             return (this->GetCurPlayerIdx() + 3) % this->GetPlayerNum();    // clockwise
         }
         if(BtnB.wasReleased()){
+
             return (this->GetCurPlayerIdx() + 1) % this->GetPlayerNum();    // counterclockwise
         }
         if(BtnC.wasReleased()){

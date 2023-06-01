@@ -1,10 +1,7 @@
-#include "Player.h"
-#include <string.h>
-#include <LiquidCrystal_I2C.h>
-#include "PlayerLcd.h"
-#include <stdint.h>
-
 #include <M5Stack.h>
+#include <stdint.h>
+#include <LiquidCrystal_I2C.h>
+#include "Player.h"
 
 Player::Player(){
 

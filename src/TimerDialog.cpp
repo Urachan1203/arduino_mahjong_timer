@@ -1,7 +1,8 @@
+#include <M5Stack.h>
 #include "TimerDialog.h"
 #include "Timer.h"
 #include "MahjongSetting.h"
-#include <M5Stack.h>
+
 
 void TimerDialog::Display(MahjongSetting* ms, TimerStatus tc){
     M5.Lcd.clear();

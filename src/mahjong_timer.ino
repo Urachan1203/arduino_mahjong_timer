@@ -1,15 +1,10 @@
+#include <M5Stack.h>
+#include <LiquidCrystal_I2C.h>
 #include "MahjongSetting.h"
 #include "MahjongSettingDialog.h"
 #include "Timer.h"
-#include "TimerDialog.h"
-#include <M5Stack.h>
-#include "PlayerLcd.h"
-#include <LiquidCrystal_I2C.h>
-#include "M5ButtonWrapper.h"
 
 MahjongSetting ms;
-
-
 
 void SystemInit(){
   M5.begin();
