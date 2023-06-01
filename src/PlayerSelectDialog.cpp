@@ -1,5 +1,6 @@
 #include "PlayerSelectDialog.h"
 #include "MahjongSetting.h"
+#include "M5ButtonWrapper.h"
 #include <M5Stack.h>
 
 const uint16_t CURSOR_X[4] = {150, 290, 150, 0};
@@ -63,15 +64,13 @@ void PlayerSelectDialog::Display(){
 int PlayerSelectDialog::ListenButtonInput(){
     while(1){
         M5.update();
-        if(M5.BtnA.wasReleased()){
-            Serial.println("pressed");
+        if(BtnA.wasReleased()){
             return (this->GetCurPlayerIdx() + 3) % this->GetPlayerNum();    // clockwise
         }
-        if(M5.BtnB.wasReleased()){
-            Serial.println("pressed");
+        if(BtnB.wasReleased()){
             return (this->GetCurPlayerIdx() + 1) % this->GetPlayerNum();    // counterclockwise
         }
-        if(M5.BtnC.wasReleased()){
+        if(BtnC.wasReleased()){
             return SELECT_EXIT;
         }
     }
@@ -79,10 +78,10 @@ int PlayerSelectDialog::ListenButtonInput(){
 
 void PlayerSelectDialog::SelectPlayer(){
     this->Display();
-    while(1){
-        Serial.println("loop");
+    M5Button::RefleshAllButton();
+
+    while(1){    
         int input = this->ListenButtonInput();
-        Serial.println(input);
         if (input == SELECT_EXIT) return;
         this->SetCurPlayerIdx(input);
         this->Display();
