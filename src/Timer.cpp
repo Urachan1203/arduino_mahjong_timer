@@ -2,6 +2,7 @@
 #include "MahjongSetting.h"
 #include "TimerDialog.h"
 #include "TimeDispMsg.h"
+#include "PlayerSelectDialog.h"
 #include <M5Stack.h>
 #include <LiquidCrystal_I2C.h>
 
@@ -26,7 +27,7 @@ void IRAM_ATTR onTimer() {
     else if(Timer::GetTimeRemainSec(cur_idx) > 0){
         Timer::SetTimeRemainSec(cur_idx, Timer::GetTimeRemainSec(cur_idx) - 1); // count down 1 sec
     }
-    TimerDialog::Display(Timer::GetMahjongSetting(), TimerCommand::Continue);
+    TimerDialog::Display(Timer::GetMahjongSetting(), TimerStatus::Continue);
 
     pause_enabled = true;
 
@@ -37,10 +38,13 @@ void IRAM_ATTR onTimer() {
 }
 
 void Timer::Init(int idx, MahjongSetting* m){
+
     Timer::SetMahjongSetting(m);
     Timer::SetCurIdx(idx);
     Timer::SetBaseTimeSec(m->GetBaseTimeSec());
 
+    // LCDに初期時間表示
+    // TODO : Timerのinitializationじゃないので別箇所に移行すべき？
     for(int i = 0; i < m->GetNumPlayer(); i++){
         Timer::SetTimeRemainSec(i, m->GetPlayer(i)->GetTimeRemainSec());
         LiquidCrystal_I2C target_lcd = m->GetPlayer(i)->GetPlayerLcd();
@@ -54,45 +58,49 @@ void Timer::Init(int idx, MahjongSetting* m){
         target_lcd.print(Timer::GetTimeRemainSec(i));
     }
 
-    // timer initialization
+    // タイマー関係
     timer = timerBegin(0, 80, true);
     timerAttachInterrupt(timer, &onTimer, true);
     timerAlarmWrite(timer, 1000000, true);      // call onTimer every 1 sec
-
     xQueue = xQueueCreate(3, sizeof(TimeDispMsg));
+
+    // 親の選択をして，誰からタイマーを開始するか決定
+    PlayerSelectDialog psd = PlayerSelectDialog(m);
+    psd.SelectPlayer();
+    Timer::SetCurIdx(psd.GetCurPlayerIdx());
 
     return;
 }
 
-TimerCommand Timer::CountTime(bool count_started){
+TimerStatus Timer::CountTime(bool count_started){
     int time_tmp = Timer::GetBaseTimeSec();
     timerAlarmEnable(timer);
 
-    TimerCommand cmd;
+    TimerStatus status;
 
     while(1){
         M5.update();
         //! 自分のターンが終わったら押下
         if(M5.BtnA.wasReleased() || M5.BtnC.wasReleased()){
-            cmd = TimerCommand::Continue;
+            status = TimerStatus::Continue;
             break;
         }
         //! 順番変更時に押下
         if(M5.BtnB.wasReleased()){
-            cmd = TimerCommand::ChangeOrder;
+            status = TimerStatus::ChangeOrder;
             break;
         }
         //! ポーズ
         if(! count_started  || (M5.BtnA.pressedFor(1000) && pause_enabled)){
-            cmd = TimerCommand::Pause;
+            status = TimerStatus::Pause;
             Timer::Pause();
-            cmd = TimerCommand::Continue;
+            status = TimerStatus::Continue;
             count_started = true;
             pause_enabled = false;
         }
         //! リセット
         if(M5.BtnC.pressedFor(2000) && pause_enabled){
-            cmd = TimerCommand::Reset;
+            status = TimerStatus::Reset;
             break;
         }
 
@@ -117,21 +125,25 @@ TimerCommand Timer::CountTime(bool count_started){
         }
         
     }
-    timerAlarmDisable(timer);
-
+    timerAlarmDisable(timer);           // カウントを停止
     Timer::SetBaseTimeSec(time_tmp);    // カウントが終了したので、basetimeを元に戻す
 
-    //! cur_idx を次の人へ
-    //! ポン発生時はこの限りではないので、順番割り込みを行うダイアログの実装がTODO
-    Timer::SetCurIdx((Timer::GetCurIdx() + 1) % Timer::GetMahjongSetting()->GetNumPlayer());
+    // 次の人に順番を回す
+    if(status == TimerStatus::ChangeOrder){
+        PlayerSelectDialog psd = PlayerSelectDialog(Timer::GetMahjongSetting(), Timer::GetCurIdx());
+        psd.SelectPlayer();
+        Timer::SetCurIdx(psd.GetCurPlayerIdx());
+    }else{
+        Timer::SetCurIdx((Timer::GetCurIdx() + 1) % Timer::GetMahjongSetting()->GetNumPlayer());
+    }
 
-    return cmd;
+    return status;
 }
 
 // press BtnA for 1 sec to continue
 void Timer::Pause(){
     timerAlarmDisable(timer);
-    TimerDialog::Display(ms, TimerCommand::Pause);
+    TimerDialog::Display(ms, TimerStatus::Pause);
     sleep(2);
     while(1){
         M5.update();
@@ -149,7 +161,7 @@ void Timer::Down(){
     else if(Timer::GetTimeRemainSec(Timer::GetCurIdx()) > 0){
         Timer::SetTimeRemainSec(Timer::GetCurIdx(), Timer::GetTimeRemainSec(Timer::GetCurIdx()) - 1);
     }
-    TimerDialog::Display(Timer::GetMahjongSetting(), TimerCommand::Continue);
+    TimerDialog::Display(Timer::GetMahjongSetting(), TimerStatus::Continue);
     return;
 }
 
