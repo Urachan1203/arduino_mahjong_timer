@@ -2,6 +2,7 @@
 #include "MahjongSettingDialog.h"
 #include "Player.h"
 #include "M5ButtonWrapper.h"
+#include "conf.h                                             "
 
 MahjongSettingDialog::MahjongSettingDialog(MahjongSetting* setting, int cur_idx){
     SetSetting(setting);
@@ -36,8 +37,9 @@ void MahjongSettingDialog::Display(){
     M5.Lcd.setCursor(10, 10);
     M5.Lcd.println("Mahjong Timer");
     M5.Lcd.setTextSize(2);
-    M5.Lcd.setCursor(250, 25);
-    M5.Lcd.println("v0.0");
+    M5.Lcd.setCursor(250, 15);
+    M5.Lcd.print("v");
+    M5.Lcd.println(VERSION);
     M5.Lcd.setTextSize(3);
     M5.Lcd.setCursor(10, 40);
     if(num_player == 4) M5.Lcd.println("4 Player");
